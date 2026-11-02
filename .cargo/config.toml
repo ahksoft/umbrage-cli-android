@@ -1,0 +1,8 @@
+[target.aarch64-linux-android]
+# Use the Android NDK's clang for cross-compiling C dependency (libusb, ring).
+# Adjust NDK path as needed; this defaults to $ANDROID_NDK_HOME or the common
+# location. If not found, you can set CC_aarch64_linux_android explicitly:
+#   export CC_aarch64_linux_android=/path/to/aarch64-linux-android21-clang
+linker = "aarch64-linux-android-clang"
+ar = "aarch64-linux-android-ar"
+rustflags = ["-C", "link-arg=-fuse-ld=lld"]

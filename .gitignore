@@ -1,0 +1,7 @@
+# Cargo build output
+/target
+
+# Editor swap/backup files
+*.swp
+*.swo
+*~

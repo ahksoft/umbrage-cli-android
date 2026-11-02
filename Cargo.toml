@@ -1,0 +1,56 @@
+[package]
+name = "umbrage-cli"
+version = "0.1.3"
+edition = "2024"
+description = "🌑 Headless CLI for flashing and exploring MTK devices"
+license = "AGPL-3.0-or-later"
+authors = ["DiabloSat <dev@diablosat.cc>"]
+repository = "https://github.com/progzone122/umbrage"
+
+# Deliberately a standalone crate: no [workspace] link to the parent umbrage
+# package, so its Qt build.rs never runs and this binary links no Qt at all.
+
+[dependencies]
+# Same pin as the GUI, same feature set. "libusb" pulls rusb; declaring rusb
+# with "vendored" below statically links libusb so the CLI needs no system
+# libusb at runtime.
+penumbra-mtk = { git = "https://github.com/umbrage-org/umbrage-penumbra", package = "penumbra-mtk", rev = "55fb158", default-features = false, features = ["libusb", "exploits"] }
+rusb = { version = "0.9", features = ["vendored"] }
+
+clap = { version = "4", features = ["derive"] }
+anyhow = "1"
+hex = "0.4"
+serde_json = "1"
+log = "0.4"
+env_logger = "0.11"
+
+# Online template repository (the GUI's Templates page, as a CLI).
+# ureq is synchronous, so this crate stays free of tokio/hyper and keeps the
+# single-threaded design the !Send Device forces. Its default `rustls`
+# feature selects ring rather than aws-lc-rs, so there is no C build beyond
+# cc, and webpki-roots means no dependency on the host CA bundle.
+# Pinned exactly: this is the version whose API this code was written
+# against, and it is the one present in the local registry cache, so builds
+# stay reproducible without network access.
+ureq = "=3.4.0"
+serde = { version = "1", features = ["derive"] }
+sha2 = "0.10"
+
+# JNI / Android support (only compiled when targeting Android)
+[target.'cfg(target_os = "android")'.dependencies]
+jni = "0.21"  # Match antumbra-android's jni version
+android_logger = { version = "0.14", optional = true }
+once_cell = "1"
+
+[features]
+default = []
+android = ["dep:android_logger"]
+
+[[bin]]
+name = "umbrage-cli"
+path = "src/main.rs"
+
+[lib]
+name = "umbrage_cli"
+crate-type = ["cdylib"]
+path = "src/lib.rs"

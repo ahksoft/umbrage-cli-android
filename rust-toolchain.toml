@@ -1,0 +1,13 @@
+# The device backend (penumbra-mtk, via its `acon` crate) uses nightly-only
+# features such as `const_trait_impl` and `trait_alias`, and this crate is
+# edition 2024. Building with stable rustc fails; rustup will select nightly
+# automatically when you run cargo inside cli/.
+[toolchain]
+channel = "nightly"
+components = ["rustfmt", "clippy"]
+
+[target.aarch64-linux-android]
+# Target triple for aarch64 Android. The Rust standard library for this target
+# is installed automatically (see `rustup target add aarch64-linux-android`).
+# A C cross-compiler (aarch64-linux-android-clang) is needed for the vendored
+# C dependencies (libusb, ring); typically provided by the Android NDK.
